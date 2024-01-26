@@ -1,0 +1,101 @@
+void Date_and_time(){
+  timeClient.forceUpdate();
+    
+  // The formattedDate comes with the following format:
+  // 2018-05-28T16:00:13Z
+  // We need to extract date and time
+  formattedDate = timeClient.getFormattedTime();
+  //Serial.println(formattedDate);
+
+  // Extract date
+  int splitT = formattedDate.indexOf("T");
+  //dayStamp = formattedDate.substring(0, splitT);
+  //Serial.print("DATE: ");
+  //Serial.println(dayStamp);
+  // Extract time
+  timeStamp = formattedDate.substring(splitT+1, formattedDate.length());
+  Serial.print("HOUR: ");
+  Serial.println(timeStamp);
+  delay(500);
+}
+
+Serial.print("Day of week: ");
+  Serial.println(&timeinfo, "%A");
+  Serial.print("Month: ");
+  Serial.println(&timeinfo, "%B");
+  Serial.print("Day of Month: ");
+  Serial.println(&timeinfo, "%d");
+  Serial.print("Year: ");
+  Serial.println(&timeinfo, "%Y");
+  Serial.print("Hour: ");
+  Serial.println(&timeinfo, "%H");
+  Serial.print("Hour (12 hour format): ");
+  Serial.println(&timeinfo, "%I");
+  Serial.print("Minute: ");
+  Serial.println(&timeinfo, "%M");
+  Serial.print("Second: ");
+  Serial.println(&timeinfo, "%S");
+
+  Serial.println("Time variables");
+  char timeHour[3];
+  strftime(timeHour,3, "%H", &timeinfo);
+  Serial.println(timeHour);
+  char timeWeekDay[10];
+  strftime(timeWeekDay,10, "%A", &timeinfo);
+  Serial.println(timeWeekDay);
+
+  "lon":105.8412,"lat":21.0245
+
+  {"cod":"200","message":0,"cnt":4,"list":[{"dt":1705654800,"main":{"temp":299.15,"feels_like":299.15,"temp_min":299.15,"temp_max":299.84,"pressure":1010,"sea_level":1010,"grnd_level":1009,"humidity":54,"temp_kf":-0.69},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04d"}],"clouds":{"all":81},"wind":{"speed":4.5,"deg":160,"gust":5.54},"visibility":10000,"pop":0.01,
+  "sys":{"pod":"d"},"dt_txt":"2024-01-19 09:00:00"},{"dt":1705665600,"main":{"temp":298.19,"feels_like":298.29,"temp_min":296.27,"temp_max":298.19,"pressure":1011,"sea_level":1011,"grnd_level":1010,"humidity":59,"temp_kf":1.92},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"clouds":{"all":69},"wind":{"speed":4.94,"deg":135,"gust":9.17},"visibility":10000,"pop":0,"sys":{"pod":"n"},"dt_txt":"2024-01-19 12:00:00"},
+  {"dt":1705676400,"main":{"temp":295.98,"feels_like":296.25,"temp_min":294.4,"temp_max":295.98,"pressure":1013,"sea_level":1013,"grnd_level":1012,"humidity":74,"temp_kf":1.58},"weather":[{"id":802,"main":"Clouds","description":"scattered clouds","icon":"03n"}],"clouds":{"all":27},"wind":{"speed":3.95,"deg":140,"gust":8.81},"visibility":10000,"pop":0,"sys":{"pod":"n"},"dt_txt":"2024-01-19 15:00:00"},{"dt":1705687200,"main":{"temp":293.56,"feels_like":294.06,"temp_min":293.56,"temp_max":293.56,"pressure":1014,"sea_level":1014,"grnd_level":1012,"humidity":92,"temp_kf":0},"weather":[{"id":800,"main":"Clear","description":"clear sky","icon":"01n"}],"clouds":{"all":5},"wind":{"speed":2.87,"deg":127,"gust":7.13},"visibility":10000,"pop":0,"sys":{"pod":"n"},"dt_txt":"2024-01-19 18:00:00"}],"city":{"id":1581130,"name":"Hanoi","coord":{"lat":21.0245,"lon":105.8412},"country":"VN","population":1431270,"timezone":25200,"sunrise":1705620966,"sunset":1705660657}}
+
+
+
+
+  void Weather_Forecast(){
+  JSONVar my_object;
+  wt weather_forecast[7];
+    if ((millis() - lastTime) > timerDelay) {
+
+        if(WiFi.status()== WL_CONNECTED){
+            //String serverPath = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "," + countryCode + "&APPID=" + Apikey;
+            String serverPath = "http://api.openweathermap.org/data/2.5/forecast?q=" + city +"," + countryCode + "&cnt=7&APPID="+Apikey;
+            
+      
+            jsonBuffer = httpGETRequest(serverPath.c_str());
+            //Serial.println(jsonBuffer);
+            my_object = JSON.parse(jsonBuffer);
+            
+
+            if (JSON.typeof(my_object) == "undefined") {
+                Serial.println("Parsing input failed!");
+                return;
+            }
+            for(int i=0;i<7;i++){
+              JSONVar res = my_object["list"][i];
+              weather_forecast[i].temp = (int)res["main"]["temp"] - 273;
+              weather_forecast[i].humi = (int)res["main"]["humidity"];
+              weather_forecast[i].cloud_speed = (double)res["wind"]["speed"];
+              Serial.print("Day ");
+              Serial.println(i+1);
+              Serial.println(weather_forecast[i].temp);
+              Serial.println(weather_forecast[i].humi);
+              Serial.println(weather_forecast[i].cloud_speed);
+            }
+            
+            //Serial.println(myObject);
+            //Serial.print("Humidity: ");
+            
+            //Serial.print("Wind Speed: ");
+            //Serial.println(myObject["wind"]["speed"]);
+            
+            
+    }
+    else {
+      Serial.println("WiFi Disconnected");
+    }
+    lastTime = millis();
+  }
+  
+}
